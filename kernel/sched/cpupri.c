@@ -98,29 +98,14 @@ static inline int __cpupri_find(struct cpupri *cp, struct task_struct *p,
 	return 1;
 }
 
-/**
- * drop_nopreempt_cpus - remove a cpu from the mask if it is likely
- *			 non-preemptible
- * @lowest_mask: mask with selected CPUs (non-NULL)
- */
-static void
-drop_nopreempt_cpus(struct cpumask *lowest_mask)
+int cpupri_find(struct cpupri *cp, struct task_struct *p,
+		struct cpumask *lowest_mask)
 {
-	unsigned int cpu = cpumask_first(lowest_mask);
-
-	while (cpu < nr_cpu_ids) {
-		/* unlocked access */
-		struct task_struct *task = READ_ONCE(cpu_rq(cpu)->curr);
-
-		if (task_may_not_preempt(task, cpu))
-			cpumask_clear_cpu(cpu, lowest_mask);
-
-		cpu = cpumask_next(cpu, lowest_mask);
-	}
+	return cpupri_find_fitness(cp, p, lowest_mask, NULL);
 }
 
 /**
- * cpupri_find - find the best (lowest-pri) CPU in the system
+ * cpupri_find_fitness - find the best (lowest-pri) CPU in the system
  * @cp: The cpupri context
  * @p: The task
  * @lowest_mask: A mask to fill in with selected CPUs (or NULL)
@@ -136,7 +121,7 @@ drop_nopreempt_cpus(struct cpumask *lowest_mask)
  *
  * Return: (int)bool - CPUs were found
  */
-int cpupri_find(struct cpupri *cp, struct task_struct *p,
+int cpupri_find_fitness(struct cpupri *cp, struct task_struct *p,
 		struct cpumask *lowest_mask,
 		bool (*fitness_fn)(struct task_struct *p, int cpu))
 {
