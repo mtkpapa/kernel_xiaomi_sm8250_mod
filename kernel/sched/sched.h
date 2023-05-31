@@ -565,6 +565,9 @@ struct cfs_rq {
 	/* h_nr_running for SCHED_IDLE tasks */
 	unsigned int		idle_h_nr_running;
 
+	s64			avg_vruntime;
+	u64			avg_load;
+
 	u64			exec_clock;
 	u64			min_vruntime;
 #ifdef CONFIG_XIAOMI_MIUI
@@ -2780,3 +2783,5 @@ static inline void sched_irq_work_queue(struct irq_work *work)
 		irq_work_queue_on(work, cpumask_any(cpu_online_mask));
 }
 #endif
+
+extern u64 avg_vruntime(struct cfs_rq *cfs_rq);
