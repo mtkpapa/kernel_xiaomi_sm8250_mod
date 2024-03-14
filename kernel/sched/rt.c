@@ -1602,6 +1602,7 @@ select_task_rq_rt(struct task_struct *p, int cpu, int sd_flag, int flags)
 {
 	struct task_struct *curr, *tgt_task;
 	struct rq *rq;
+	bool may_not_preempt;
 	bool test;
 
 	/* For anything but wake ups, just return the task_cpu */
@@ -1649,13 +1650,14 @@ select_task_rq_rt(struct task_struct *p, int cpu, int sd_flag, int flags)
 	 * requirement of the task - which is only important on heterogeneous
 	 * systems like big.LITTLE.
 	 */
-	test = curr &&
-	       unlikely(rt_task(curr)) &&
-	       (curr->nr_cpus_allowed < 2 || curr->prio <= p->prio);
+	may_not_preempt = task_may_not_preempt(curr, cpu);
+
+	test = static_branch_unlikely(&sched_energy_present) ||
+	       may_not_preempt || (curr && unlikely(rt_task(curr)) &&
+	       (curr->nr_cpus_allowed < 2 || curr->prio <= p->prio));
 
 	if (test || !rt_task_fits_capacity(p, cpu)) {
 		int target = find_lowest_rq(p);
-
 
 		/*
 		 * Check once for losing a race with the other core's irq
@@ -1680,7 +1682,8 @@ select_task_rq_rt(struct task_struct *p, int cpu, int sd_flag, int flags)
 		 * not running a lower priority task.
 		 */
 		if (target != -1 &&
-		    p->prio < cpu_rq(target)->rt.highest_prio.curr)
+		   (may_not_preempt ||
+		    p->prio < cpu_rq(target)->rt.highest_prio.curr))
 			cpu = target;
 	}
 
