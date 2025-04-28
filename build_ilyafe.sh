@@ -286,6 +286,9 @@ scripts/config --file out/.config \
     -e KPERFEVENTS \
     -e MILLET \
     -d LTO_CLANG \
+	-d LLVM_POLLY \ 
+	-d LD_DEAD_CODE_ELIMINATION \
+	-d OPTIMIZE_INLINING \
     -e PERF_HUMANTASK \
     -d LOCALVERSION_AUTO \
     -e SF_BINDER \
