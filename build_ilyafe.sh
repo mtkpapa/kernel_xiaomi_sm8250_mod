@@ -113,12 +113,12 @@ git clone https://github.com/liyafe1997/AnyKernel3 -b kona --single-branch --dep
 local_version_str="-perf"
 local_version_date_str="-$(date +%Y%m%d)-${GIT_COMMIT_ID}-perf"
 
-sed -i "s/${local_version_str}/${local_version_date_str}/g" out/.config
-
 # ------------- Building for AOSP -------------
 
 echo "Building for AOSP......"
 make $MAKE_ARGS ${TARGET_DEVICE}_defconfig
+
+sed -i "s/${local_version_str}/${local_version_date_str}/g" out/.config
 
 if [ $KSU_ENABLE -eq 1 ]; then
     scripts/config --file out/.config \
@@ -246,6 +246,8 @@ sed -i 's/\/\/39 01 00 00 11 00 03 51 03 FF/39 01 00 00 11 00 03 51 03 FF/g' ${d
 
 
 make $MAKE_ARGS ${TARGET_DEVICE}_defconfig
+
+sed -i "s/${local_version_str}/${local_version_date_str}/g" out/.config
 
 if [ $KSU_ENABLE -eq 1 ]; then
     scripts/config --file out/.config \
