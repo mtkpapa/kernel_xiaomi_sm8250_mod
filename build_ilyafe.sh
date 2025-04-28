@@ -113,7 +113,7 @@ git clone https://github.com/liyafe1997/AnyKernel3 -b kona --single-branch --dep
 local_version_str="-perf"
 local_version_date_str="-$(date +%Y%m%d)-${GIT_COMMIT_ID}-perf"
 
-sed -i "s/${local_version_str}/${local_version_date_str}/g" arch/arm64/configs/${TARGET_DEVICE}_defconfig
+sed -i "s/${local_version_str}/${local_version_date_str}/g" out/.config
 
 # ------------- Building for AOSP -------------
 
@@ -164,11 +164,12 @@ cp out/arch/arm64/boot/dtb anykernel/kernels/
 
 cd anykernel 
 
-ZIP_FILENAME=Kernel_AOSP_${TARGET_DEVICE}_${KSU_ZIP_STR}_$(date +'%Y%m%d_%H%M%S')_anykernel3_${GIT_COMMIT_ID}.zip
+ZIP_FILENAME=IlyafeKernel_AOSP_${TARGET_DEVICE}_${KSU_ZIP_STR}_$(date +'%Y%m%d_%H%M%S').zip
+KOUT_PATH="/mnt/d/users/juan/kernels/${TARGET_DEVICE}/"
 
 zip -r9 $ZIP_FILENAME ./* -x .git .gitignore out/ ./*.zip
 
-mv $ZIP_FILENAME ../
+mv $ZIP_FILENAME $KOUT_PATH
 
 cd ..
 
@@ -326,7 +327,7 @@ cp out/arch/arm64/boot/dtb anykernel/kernels/
 echo "Build for MIUI finished."
 
 # Restore local version string
-sed -i "s/${local_version_date_str}/${local_version_str}/g" arch/arm64/configs/${TARGET_DEVICE}_defconfig
+# sed -i "s/${local_version_date_str}/${local_version_str}/g" arch/arm64/configs/${TARGET_DEVICE}_defconfig
 
 # ------------- End of Building for MIUI -------------
 #  If you don't need MIUI you can comment out the above block [Building for MIUI]
@@ -334,12 +335,16 @@ sed -i "s/${local_version_date_str}/${local_version_str}/g" arch/arm64/configs/$
 
 cd anykernel 
 
-ZIP_FILENAME=Kernel_MIUI_${TARGET_DEVICE}_${KSU_ZIP_STR}_$(date +'%Y%m%d_%H%M%S')_anykernel3_${GIT_COMMIT_ID}.zip
+ZIP_FILENAME=IlyafeKernel_MIUI_${TARGET_DEVICE}_${KSU_ZIP_STR}_$(date +'%Y%m%d_%H%M%S').zip
 
 zip -r9 $ZIP_FILENAME ./* -x .git .gitignore out/ ./*.zip
 
-mv $ZIP_FILENAME ../
+mv $ZIP_FILENAME $KOUT_PATH
 
 cd ..
 
 echo "Done. The flashable zip is: [./$ZIP_FILENAME]"
+
+rm -rf out/
+rm -rf KernelSU-Next/
+rm -rf anykernel/
