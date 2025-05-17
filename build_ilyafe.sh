@@ -162,7 +162,7 @@ mkdir -p anykernel/kernels/
 
 cp out/arch/arm64/boot/Image anykernel/kernels/
 cp out/arch/arm64/boot/dtb anykernel/kernels/
-mkdir anykernel/modules/vendor/lib/modules
+mkdir -p anykernel/modules/vendor/lib/modules
 cp out/vova/* anykernel/modules/vendor/lib/modules/
 
 cd anykernel 
@@ -328,7 +328,7 @@ mkdir -p anykernel/kernels/
 
 cp out/arch/arm64/boot/Image anykernel/kernels/
 cp out/arch/arm64/boot/dtb anykernel/kernels/
-mkdir anykernel/modules/vendor/lib/modules
+mkdir -p anykernel/modules/vendor/lib/modules
 cp out/vova/* anykernel/modules/vendor/lib/modules/
 
 echo "Build for MIUI finished."
