@@ -306,7 +306,7 @@ scripts/config --file out/.config \
 
 make $MAKE_ARGS -j$(nproc)
 
-
+make $MAKE_ARGS INSTALL_MOD_PATH=out/vova modules_install
 
 if [ -f "out/arch/arm64/boot/Image" ]; then
     echo "The file [out/arch/arm64/boot/Image] exists. MIUI Build successfully."
