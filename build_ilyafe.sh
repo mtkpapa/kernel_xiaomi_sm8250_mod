@@ -144,8 +144,6 @@ fi
 
 make $MAKE_ARGS -j$(nproc)
 
-make $MAKE_ARGS INSTALL_MOD_PATH=out/vova modules_install
-
 if [ -f "out/arch/arm64/boot/Image" ]; then
     echo "The file [out/arch/arm64/boot/Image] exists. AOSP Build successfully."
 else
@@ -162,12 +160,10 @@ mkdir -p anykernel/kernels/
 
 cp out/arch/arm64/boot/Image anykernel/kernels/
 cp out/arch/arm64/boot/dtb anykernel/kernels/
-mkdir -p anykernel/modules/vendor/lib/modules
-cp out/vova/* anykernel/modules/vendor/lib/modules/
 
 cd anykernel 
 
-ZIP_FILENAME=ScratchKernel_AOSP_${TARGET_DEVICE}_${KSU_ZIP_STR}_$(date +'%Y%m%d_%H%M%S').zip
+ZIP_FILENAME=ScratchKernel_AOSP_psyche_${KSU_ZIP_STR}_$(date +'%Y%m%d_%H%M%S').zip
 KOUT_PATH="/mnt/d/users/juan/kernels/${TARGET_DEVICE}/"
 
 zip -r9 $ZIP_FILENAME ./* -x .git .gitignore out/ ./*.zip
@@ -306,8 +302,6 @@ scripts/config --file out/.config \
 
 make $MAKE_ARGS -j$(nproc)
 
-make $MAKE_ARGS INSTALL_MOD_PATH=out/vova modules_install
-
 if [ -f "out/arch/arm64/boot/Image" ]; then
     echo "The file [out/arch/arm64/boot/Image] exists. MIUI Build successfully."
 else
@@ -328,8 +322,6 @@ mkdir -p anykernel/kernels/
 
 cp out/arch/arm64/boot/Image anykernel/kernels/
 cp out/arch/arm64/boot/dtb anykernel/kernels/
-mkdir -p anykernel/modules/vendor/lib/modules
-cp out/vova/* anykernel/modules/vendor/lib/modules/
 
 echo "Build for MIUI finished."
 
@@ -342,7 +334,7 @@ echo "Build for MIUI finished."
 
 cd anykernel 
 
-ZIP_FILENAME=ScratchKernel_MIUI_${TARGET_DEVICE}_${KSU_ZIP_STR}_$(date +'%Y%m%d_%H%M%S').zip
+ZIP_FILENAME=ScratchKernel_MIUI_psyche_${KSU_ZIP_STR}_$(date +'%Y%m%d_%H%M%S').zip
 
 zip -r9 $ZIP_FILENAME ./* -x .git .gitignore out/ ./*.zip
 
