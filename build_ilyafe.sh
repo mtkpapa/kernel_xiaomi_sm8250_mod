@@ -112,6 +112,7 @@ git clone https://github.com/liyafe1997/AnyKernel3 -b kona --single-branch --dep
 # Add date to local version
 local_version_str="-perf"
 local_version_date_str="-IlyafeKernel-$(date +%Y%m%d)"
+KOUT_PATH="/mnt/d/users/juan/kernels/${TARGET_DEVICE}/"
 
 # ------------- Building for AOSP -------------
 
@@ -165,7 +166,6 @@ cp out/arch/arm64/boot/dtb anykernel/kernels/
 cd anykernel 
 
 ZIP_FILENAME=IlyafeKernel_AOSP_${TARGET_DEVICE}_${KSU_ZIP_STR}_$(date +'%Y%m%d_%H%M%S').zip
-KOUT_PATH="/mnt/d/users/juan/kernels/${TARGET_DEVICE}/"
 
 zip -r9 $ZIP_FILENAME ./* -x .git .gitignore out/ ./*.zip
 
