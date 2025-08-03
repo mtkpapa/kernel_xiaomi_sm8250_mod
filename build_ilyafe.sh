@@ -111,7 +111,7 @@ git clone https://github.com/liyafe1997/AnyKernel3 -b kona --single-branch --dep
 
 # Add date to local version
 local_version_str="-perf"
-local_version_date_str="-IlyafeKernel-$(date +%Y%m%d)"
+local_version_date_str="-LiyafeKernel-$(date +%Y%m%d)-perf"
 
 # ------------- Building for AOSP -------------
 
