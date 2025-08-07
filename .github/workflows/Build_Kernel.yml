@@ -1,0 +1,123 @@
+name: Build Kernel
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_device:
+        description: 'Target device'
+        required: true
+        default: 'psyche'
+        type: choice
+        options:
+          - 'munch'
+          - 'lmi'
+          - 'umi'
+          - 'psyche'
+          - 'thyme'
+          - 'cmi'
+          - 'cas'
+          - 'apollo'
+          - 'alioth'
+          - 'elish'
+          - 'enuma'
+          - 'dagu'
+          - 'pipa'
+
+      system_version:
+        description: 'Target System'
+        required: true
+        type: choice
+        default: 'miui'
+        options:
+          - 'aosp'
+          - 'miui'
+          - 'all'
+
+      kernelsu_version:
+        description: 'KernelSU Version'
+        required: true
+        type: choice
+        default: 'sukisu-ultra'
+        options:
+          - 'sukisu-ultra'
+          - 'ksu'
+          - 'rksu'
+          - 'sukisu'
+          - 'noksu'
+
+      additional_function:
+        description: 'Additional Functions'
+        required: true
+        type: choice
+        default: 'no'
+        options:
+          - 'no'
+          - 'susfs-kpm'
+          - 'susfs'
+          - 'kpm'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Kernel Source
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update -y 
+          sudo apt-get install -y \
+          build-essential git curl wget bison flex zip bc \
+          cpio libssl-dev libncurses-dev gcc \
+          python3 python3-pip ccache
+            
+      - name: Cache Proton Clang
+        uses: actions/cache@v4
+        id: clang-cache
+        with:
+          path: toolchain/proton-clang
+          key: ${{ runner.os }}-proton-clang
+
+      - name: Download Proton Clang Toolchain
+        if: steps.clang-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p toolchain; cd toolchain
+          wget https://github.com/kdrag0n/proton-clang/archive/refs/tags/20210522.zip
+          unzip 20210522.zip
+          mv proton-clang-20210522 proton-clang
+          rm proton-clang/bin/ld 20210522.zip
+          
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ccache_mikernel
+          key: ${{ runner.os }}-ccache-${{ github.event.inputs.target_device }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-ccache-${{ github.event.inputs.target_device }}-
+
+      - name: Build Kernel
+        run: |
+          sed -i 's|TOOLCHAIN_PATH=\$HOME/toolchain/proton-clang/bin|TOOLCHAIN_PATH=$(pwd)/toolchain/proton-clang/bin|' build.sh
+          DEVICE="${{ github.event.inputs.target_device }}"
+          SYSTEM="${{ github.event.inputs.system_version }}"
+          KSU_VERSION="${{ github.event.inputs.kernelsu_version }}"
+          ADDITIONAL_FUNCTION="${{ github.event.inputs.additional_function }}"
+          bash build.sh "$DEVICE" "$KSU_VERSION" $ADDITIONAL_FUNCTION "$SYSTEM"
+
+      - name: Set Kernel Path
+        run: |
+          if [[ "${{ github.event.inputs.system_version }}" == "aosp" || "${{ github.event.inputs.system_version }}" == "miui" ]]; then
+              KernelPath=$(ls Kernel_* 2>/dev/null || true)
+              echo "KernelPath=$(pwd)/$KernelPath" >> $GITHUB_ENV
+          else
+              tar -czvf Kernel_All.tar.gz Kernel_*
+              KernelPath=$(pwd)/Kernel_All.tar.gz
+              echo "KernelPath=$KernelPath" >> $GITHUB_ENV
+          fi
+      
+      - name: Upload Kernel
+        uses: actions/upload-artifact@v4
+        with:
+          name: Kernel
+          path: ${{ env.KernelPath }}
