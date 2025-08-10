@@ -111,7 +111,7 @@ git clone https://github.com/liyafe1997/AnyKernel3 -b kona --single-branch --dep
 
 # Add date to local version
 local_version_str="-perf"
-local_version_date_str="-IlyafeKernel-$(date +%Y%m%d)"
+local_version_date_str="-LiyafeKernel-$(date +%Y%m%d)-perf"
 KOUT_PATH="/mnt/d/users/juan/kernels/${TARGET_DEVICE}/"
 
 # ------------- Building for MIUI -------------
@@ -186,6 +186,7 @@ sed -i "s/${local_version_str}/${local_version_date_str}/g" out/.config
 if [ $KSU_ENABLE -eq 1 ]; then
     scripts/config --file out/.config \
     -e KSU \
+    -e KSU_MANUAL_HOOK \
     -e KSU_SUSFS_HAS_MAGIC_MOUNT \
     -d KSU_SUSFS_SUS_PATH \
     -e KSU_SUSFS_SUS_MOUNT \
@@ -271,7 +272,7 @@ echo "Build for MIUI finished."
 
 cd anykernel 
 
-ZIP_FILENAME=IlyafeKernel_MIUI_${TARGET_DEVICE}_${KSU_ZIP_STR}_$(date +'%Y%m%d_%H%M%S').zip
+ZIP_FILENAME=LiyafeKernel_MIUI_${TARGET_DEVICE}_${KSU_ZIP_STR}_$(date +'%Y%m%d_%H%M%S').zip
 
 zip -r9 $ZIP_FILENAME ./* -x .git .gitignore out/ ./*.zip
 
