@@ -239,17 +239,21 @@ out_path_put_path:
 }
 
 static inline bool is_i_uid_in_android_data_not_allowed(uid_t i_uid) {
-	return (likely(susfs_is_current_non_root_user_app_proc()) &&
-		unlikely(current_uid().val != i_uid));
+	uid_t cur_uid = current_uid().val;
+
+	return (likely(current->susfs_task_state & TASK_STRUCT_NON_ROOT_USER_APP_PROC) &&
+							(unlikely(cur_uid != i_uid)));
 }
 
 static inline bool is_i_uid_in_sdcard_not_allowed(void) {
-	return (likely(susfs_is_current_non_root_user_app_proc()));
+	return (likely(current->susfs_task_state & TASK_STRUCT_NON_ROOT_USER_APP_PROC));
 }
 
 static inline bool is_i_uid_not_allowed(uid_t i_uid) {
-	return (likely(susfs_is_current_non_root_user_app_proc()) &&
-		unlikely(current_uid().val != i_uid));
+	uid_t cur_uid = current_uid().val;
+
+	return (likely(current->susfs_task_state & TASK_STRUCT_NON_ROOT_USER_APP_PROC) &&
+							(unlikely(cur_uid != i_uid)));
 }
 
 bool susfs_is_base_dentry_android_data_dir(struct dentry* base) {
@@ -1085,106 +1089,6 @@ out:
 }
 #endif // #ifdef CONFIG_KSU_SUSFS_SUS_SU
 
-static int copy_config_to_buf(const char *config_string, char *buf_ptr, size_t *copied_size, size_t bufsize) {
-	size_t tmp_size = strlen(config_string);
-
-	*copied_size += tmp_size;
-	if (*copied_size >= bufsize) {
-		SUSFS_LOGE("bufsize is not big enough to hold the string.\n");
-		return -EINVAL;
-	}
-	strncpy(buf_ptr, config_string, tmp_size);
-	return 0;
-}
-
-int susfs_get_enabled_features(char __user* buf, size_t bufsize) {
-	char *kbuf = NULL, *buf_ptr = NULL;
-	size_t copied_size = 0;
-	int err = 0;
-
-	kbuf = kzalloc(bufsize, GFP_KERNEL);
-	if (!kbuf) {
-		return -ENOMEM;
-	}
-
-	buf_ptr = kbuf;
-#ifdef CONFIG_KSU_SUSFS_SUS_PATH
-	err = copy_config_to_buf("CONFIG_KSU_SUSFS_SUS_PATH\n", buf_ptr, &copied_size, bufsize);
-	if (err) goto out_kfree_kbuf;
-	buf_ptr = kbuf + copied_size;
-#endif
-#ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
-	err = copy_config_to_buf("CONFIG_KSU_SUSFS_SUS_MOUNT\n", buf_ptr, &copied_size, bufsize);
-	if (err) goto out_kfree_kbuf;
-	buf_ptr = kbuf + copied_size;
-#endif
-#ifdef CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT
-	err = copy_config_to_buf("CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT\n", buf_ptr, &copied_size, bufsize);
-	if (err) goto out_kfree_kbuf;
-	buf_ptr = kbuf + copied_size;
-#endif
-#ifdef CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT
-	err = copy_config_to_buf("CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT\n", buf_ptr, &copied_size, bufsize);
-	if (err) goto out_kfree_kbuf;
-	buf_ptr = kbuf + copied_size;
-#endif
-#ifdef CONFIG_KSU_SUSFS_SUS_KSTAT
-	err = copy_config_to_buf("CONFIG_KSU_SUSFS_SUS_KSTAT\n", buf_ptr, &copied_size, bufsize);
-	if (err) goto out_kfree_kbuf;
-	buf_ptr = kbuf + copied_size;
-#endif
-#ifdef CONFIG_KSU_SUSFS_TRY_UMOUNT
-	err = copy_config_to_buf("CONFIG_KSU_SUSFS_TRY_UMOUNT\n", buf_ptr, &copied_size, bufsize);
-	if (err) goto out_kfree_kbuf;
-	buf_ptr = kbuf + copied_size;
-#endif
-#ifdef CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT
-	err = copy_config_to_buf("CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT\n", buf_ptr, &copied_size, bufsize);
-	if (err) goto out_kfree_kbuf;
-	buf_ptr = kbuf + copied_size;
-#endif
-#ifdef CONFIG_KSU_SUSFS_SPOOF_UNAME
-	err = copy_config_to_buf("CONFIG_KSU_SUSFS_SPOOF_UNAME\n", buf_ptr, &copied_size, bufsize);
-	if (err) goto out_kfree_kbuf;
-	buf_ptr = kbuf + copied_size;
-#endif
-#ifdef CONFIG_KSU_SUSFS_ENABLE_LOG
-	err = copy_config_to_buf("CONFIG_KSU_SUSFS_ENABLE_LOG\n", buf_ptr, &copied_size, bufsize);
-	if (err) goto out_kfree_kbuf;
-	buf_ptr = kbuf + copied_size;
-#endif
-#ifdef CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS
-	err = copy_config_to_buf("CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS\n", buf_ptr, &copied_size, bufsize);
-	if (err) goto out_kfree_kbuf;
-	buf_ptr = kbuf + copied_size;
-#endif
-#ifdef CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG
-	err = copy_config_to_buf("CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG\n", buf_ptr, &copied_size, bufsize);
-	if (err) goto out_kfree_kbuf;
-	buf_ptr = kbuf + copied_size;
-#endif
-#ifdef CONFIG_KSU_SUSFS_OPEN_REDIRECT
-	err = copy_config_to_buf("CONFIG_KSU_SUSFS_OPEN_REDIRECT\n", buf_ptr, &copied_size, bufsize);
-	if (err) goto out_kfree_kbuf;
-	buf_ptr = kbuf + copied_size;
-#endif
-#ifdef CONFIG_KSU_SUSFS_SUS_SU
-	err = copy_config_to_buf("CONFIG_KSU_SUSFS_SUS_SU\n", buf_ptr, &copied_size, bufsize);
-	if (err) goto out_kfree_kbuf;
-	buf_ptr = kbuf + copied_size;
-#endif
-#ifdef CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT
-	err = copy_config_to_buf("CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT\n", buf_ptr, &copied_size, bufsize);
-	if (err) goto out_kfree_kbuf;
-	buf_ptr = kbuf + copied_size;
-#endif
-	err = copy_to_user((void __user*)buf, (void *)kbuf, bufsize);
-out_kfree_kbuf:
-	kfree(kbuf);
-	return err;
-}
-
-
 /* susfs_init */
 void susfs_init(void) {
 	spin_lock_init(&susfs_spin_lock);
@@ -1197,3 +1101,4 @@ void susfs_init(void) {
 
 /* No module exit is needed becuase it should never be a loadable kernel module */
 //void __init susfs_exit(void)
+

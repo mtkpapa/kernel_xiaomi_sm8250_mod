@@ -12,7 +12,6 @@
 #define CMD_SUSFS_SET_SDCARD_ROOT_PATH 0x55552
 #define CMD_SUSFS_ADD_SUS_MOUNT 0x55560
 #define CMD_SUSFS_HIDE_SUS_MNTS_FOR_ALL_PROCS 0x55561
-#define CMD_SUSFS_UMOUNT_FOR_ZYGOTE_ISO_SERVICE 0x55562
 #define CMD_SUSFS_ADD_SUS_KSTAT 0x55570
 #define CMD_SUSFS_UPDATE_SUS_KSTAT 0x55571
 #define CMD_SUSFS_ADD_SUS_KSTAT_STATICALLY 0x55572
@@ -46,17 +45,15 @@
 /*
  * inode->i_state => storing flag 'INODE_STATE_'
  * mount->mnt.susfs_mnt_id_backup => storing original mnt_id of normal mounts or custom sus mnt_id of sus mounts
- * inode->i_mapping->flags => storing flag 'AS_FLAGS_'
- * nd->state => storing flag 'ND_STATE_'
- * nd->flags => storing flag 'ND_FLAGS_'
- * task_struct->thread_info.flags => storing flag 'TIF_'
+ * task_struct->susfs_last_fake_mnt_id => storing last valid fake mnt_id (will be deprecated or exclusive for non-gki only)
+ * task_struct->susfs_task_state => storing flag 'TASK_STRUCT_'
  */
 #define INODE_STATE_SUS_PATH BIT(24)
 #define INODE_STATE_SUS_MOUNT BIT(25)
 #define INODE_STATE_SUS_KSTAT BIT(26)
 #define INODE_STATE_OPEN_REDIRECT BIT(27)
 
-#define TIF_NON_ROOT_USER_APP_PROC 33 // thread_info->flags is unsigned long :D
+#define TASK_STRUCT_NON_ROOT_USER_APP_PROC BIT(24)
 
 #define AS_FLAGS_ANDROID_DATA_ROOT_DIR 28
 #define AS_FLAGS_SDCARD_ROOT_DIR 29
@@ -73,14 +70,5 @@
 #define DATA_ADB_NO_AUTO_ADD_SUS_BIND_MOUNT "/data/adb/susfs_no_auto_add_sus_bind_mount"
 #define DATA_ADB_NO_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT "/data/adb/susfs_no_auto_add_sus_ksu_default_mount"
 #define DATA_ADB_NO_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT "/data/adb/susfs_no_auto_add_try_umount_for_bind_mount"
-
-static inline bool susfs_is_current_non_root_user_app_proc(void) {
-	return test_ti_thread_flag(&current->thread_info, TIF_NON_ROOT_USER_APP_PROC);
-}
-
-static inline void susfs_set_current_non_root_user_app_proc(void) {
-	set_ti_thread_flag(&current->thread_info, TIF_NON_ROOT_USER_APP_PROC);
-}
-
 
 #endif // #ifndef KSU_SUSFS_DEF_H
