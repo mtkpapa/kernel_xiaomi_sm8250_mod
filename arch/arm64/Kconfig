@@ -1614,7 +1614,7 @@ choice
 	prompt "Kernel compression method"
 	default BUILD_ARM64_KERNEL_COMPRESSION_GZIP
 	help
-	  Allows choice between gzip compressed or uncompressed
+	  Allows choice between compressed or uncompressed
 	  kernel image
 
 config BUILD_ARM64_KERNEL_COMPRESSION_GZIP
@@ -1624,6 +1624,12 @@ config BUILD_ARM64_KERNEL_COMPRESSION_GZIP
 	  compression with concatenated dtb.
 	  gzip is based on the DEFLATE
 	  algorithm.
+	  
+config BUILD_ARM64_KERNEL_COMPRESSION_ZSTD
+	bool "Build compressed kernel image"
+	help
+	  Build a kernel image using zstd
+	  compression with concatenated dtb.
 
 config BUILD_ARM64_UNCOMPRESSED_KERNEL
 	bool "Build uncompressed kernel image"

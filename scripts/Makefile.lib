@@ -354,6 +354,13 @@ cmd_bzip2 = (cat $(filter-out FORCE,$^) | \
 	bzip2 -9 && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
 	(rm -f $@ ; false)
 
+# Zstandart
+# ---------------------------------------------------------------------------
+quiet_cmd_zstd = ZSTD    $@
+cmd_zstd = (cat $(filter-out FORCE,$^) | \
+    zstd -12 && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
+	(rm -f $@ ; false)
+
 # Lzma
 # ---------------------------------------------------------------------------
 

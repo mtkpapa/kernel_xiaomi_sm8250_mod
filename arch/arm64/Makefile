@@ -150,7 +150,11 @@ core-$(CONFIG_EFI_STUB) += $(objtree)/drivers/firmware/efi/libstub/lib.a
 ifeq ($(CONFIG_BUILD_ARM64_KERNEL_COMPRESSION_GZIP),y)
 KBUILD_IMAGE   := Image.gz
 else
+ifeq ($(CONFIG_BUILD_ARM64_KERNEL_COMPRESSION_ZSTD),y)
+KBUILD_IMAGE   := Image.zst
+else
 KBUILD_IMAGE   := Image
+endif
 endif
 
 # Default target when executing plain make
