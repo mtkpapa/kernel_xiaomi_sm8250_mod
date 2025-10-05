@@ -264,13 +264,13 @@ build_miui() {
 		-e SF_BINDER		\
 		-e OVERLAY_FS		\
 		-d DEBUG_FS \
-		-e MIGT \
-		-e MIGT_ENERGY_MODEL \
+		-d MIGT \
+		-d MIGT_ENERGY_MODEL \
 		-e MIHW \
-		-e PACKAGE_RUNTIME_INFO \
+		-d PACKAGE_RUNTIME_INFO \
 		-e BINDER_OPT \
 		-e KPERFEVENTS \
-		-e MILLET \
+		-d MILLET \
 		-e PERF_HUMANTASK \
 		-d LOCALVERSION_AUTO \
 		-e SF_BINDER \
