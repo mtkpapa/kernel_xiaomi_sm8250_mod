@@ -704,7 +704,7 @@ KBUILD_CFLAGS   += -O3
 endif
 
 ifdef CONFIG_CC_WERROR
-KBUILD_CFLAGS  += -Werror -Wno-default-const-init-field-unsafe -Wno-default-const-init-var-unsafe -Wno-implicit-enum-enum-cast
+KBUILD_CFLAGS  += -Werror
 endif
 
 # Tell gcc to never replace conditional load with a non-conditional one
