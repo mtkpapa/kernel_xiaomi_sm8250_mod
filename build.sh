@@ -98,79 +98,10 @@ local_version_date_str="-IlyafeKernel-$(date +%Y%m%d)"
 
 KOUT_PATH="/mnt/d/users/juan/kernels/${TARGET_DEVICE}/"
 
-# ------------- Building for AOSP -------------
-
-build_aosp() {
-	echo "Building for AOSP......"
-	make "${MAKE_ARGS[@]}" ${TARGET_DEVICE}_defconfig
-
-	sed -i "s/${local_version_str}/${local_version_date_str}/g" out/.config
-
-	if [ $KSU_ENABLE -eq 1 ]; then
-		scripts/config --file out/.config \
-		-e KSU \
-		-e KSU_SUSFS_HAS_MAGIC_MOUNT \
-		-d KSU_SUSFS_SUS_PATH \
-		-e KSU_SUSFS_SUS_MOUNT \
-		-e KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT \
-		-e KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT \
-		-e KSU_SUSFS_SUS_KSTAT \
-		-d KSU_SUSFS_SUS_OVERLAYFS \
-		-e KSU_SUSFS_TRY_UMOUNT \
-		-e KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT \
-		-e KSU_SUSFS_SPOOF_UNAME \
-		-e KSU_SUSFS_ENABLE_LOG \
-		-e KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS \
-		-e KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG \
-		-d KSU_SUSFS_OPEN_REDIRECT \
-		-d KSU_SUSFS_SUS_SU 
-	else
-		scripts/config --file out/.config -d KSU
-	fi
-
-	make "${MAKE_ARGS[@]}" -j$(nproc)
-
-
-	if [ -f "out/arch/arm64/boot/Image" ]; then
-		echo "The file [out/arch/arm64/boot/Image] exists. AOSP Build successfully."
-	else
-		echo "The file [out/arch/arm64/boot/Image] does not exist. Seems AOSP build failed."
-		exit 1
-	fi
-
-	echo "Generating [out/arch/arm64/boot/dtb]......"
-	find out/arch/arm64/boot/dts -name '*.dtb' -exec cat {} + >out/arch/arm64/boot/dtb
-
-	rm -rf anykernel/kernels/
-
-	mkdir -p anykernel/kernels/
-
-	cp out/arch/arm64/boot/Image anykernel/kernels/
-	cp out/arch/arm64/boot/dtb anykernel/kernels/
-
-	cd anykernel 
-
-	ZIP_FILENAME=IlyafeKernel_AOSP_${TARGET_DEVICE}_${KSU_ZIP_STR}_$(date +'%Y%m%d_%H%M%S').zip
-
-	zip -r9 $ZIP_FILENAME ./* -x .git .gitignore out/ ./*.zip
-
-	mv $ZIP_FILENAME $KOUT_PATH
-
-	cd ..
-
-
-	echo "Build for AOSP finished."
-}
-
-# ------------- End of Building for AOSP -------------
-#  If you don't need AOSP you can comment out the above block [Building for AOSP]
-
-
 # ------------- Building for MIUI -------------
 
 build_miui() {
-	echo "Clearning [out/] and build for MIUI....."
-	rm -rf out/
+	echo "Building for MIUI....."
 
 	dts_source=arch/arm64/boot/dts/vendor/qcom
 	
@@ -326,16 +257,7 @@ build_miui() {
 # ------------- End of Building for MIUI -------------
 #  If you don't need MIUI you can comment out the above block [Building for MIUI]
 
-if [ "$3" == "miui" ]; then
-	echo "MIUI only build"
-	build_miui
-elif [ "$3" == "aosp" ]; then 
-	echo "AOSP only build"
-	build_aosp
-else
-	build_aosp
-	build_miui
-fi
+build_miui
 
 echo "Done. The flashable zip is: [./$ZIP_FILENAME]"
 
