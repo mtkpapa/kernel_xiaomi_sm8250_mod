@@ -96,7 +96,7 @@ git clone https://github.com/liyafe1997/AnyKernel3 -b kona --single-branch --dep
 local_version_str="-perf"
 local_version_date_str="-IlyafeKernel-$(date +%Y%m%d)"
 
-KOUT_PATH="/mnt/d/users/juan/kernels/${TARGET_DEVICE}/"
+KOUT_PATH="/home/maksos/build/Kernels/${TARGET_DEVICE}/"
 
 # ------------- Building for MIUI -------------
 
