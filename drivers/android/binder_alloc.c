@@ -34,9 +34,6 @@
 #include <linux/highmem.h>
 #include "binder_alloc.h"
 #include "binder_trace.h"
-#ifdef CONFIG_MILLET
-#include <linux/millet.h>
-#endif
 
 struct list_lru binder_alloc_lru;
 
@@ -351,10 +348,6 @@ static inline struct vm_area_struct *binder_alloc_get_vma(
 	return vma;
 }
 
-#ifdef CONFIG_MILLET
-extern struct task_struct *binder_buff_owner(struct binder_alloc *alloc);
-#endif
-
 static void debug_low_async_space_locked(struct binder_alloc *alloc, int pid)
 {
 	/*
@@ -492,26 +485,6 @@ struct binder_buffer *binder_alloc_new_buf_locked(
 			}
 		}
 	}
-
-#ifdef CONFIG_MILLET
-	if (is_async &&
-		(alloc->free_async_space < WARN_AHEAD_MSGS * (size + sizeof(struct binder_buffer))
-		|| alloc->free_async_space < binder_warn_ahead_space)) {
-		struct millet_data data;
-		struct task_struct *owner;
-
-		owner = binder_buff_owner(alloc);
-		if (owner) {
-			memset(&data, 0, sizeof(struct millet_data));
-			data.pri[0] =  BINDER_BUFF_WARN;
-			data.mod.k_priv.binder.trans.dst_task = owner;
-			data.mod.k_priv.binder.trans.src_task = current;
-			millet_sendmsg(BINDER_TYPE, owner, &data);
-		}
-
-		binder_alloc_debug(BINDER_DEBUG_BUFFER_ALLOC, "%s", NAME_ARRAY[0]);
-	}
-#endif
 
 	/* Pad 0-size buffers so they get assigned unique addresses */
 	size = max(size, sizeof(void *));

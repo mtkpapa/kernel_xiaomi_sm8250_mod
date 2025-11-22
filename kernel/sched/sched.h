@@ -3317,10 +3317,3 @@ static inline void sched_irq_work_queue(struct irq_work *work)
 		irq_work_queue_on(work, cpumask_any(cpu_online_mask));
 }
 #endif
-
-#ifdef CONFIG_PACKAGE_RUNTIME_INFO
-void __weak init_task_runtime_info(struct task_struct *tsk)
-{
-	return;
-}
-#endif

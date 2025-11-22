@@ -6997,19 +6997,6 @@ static int get_start_cpu(struct task_struct *p)
 		return start_cpu;
 	}
 
-#ifdef CONFIG_PACKAGE_RUNTIME_INFO
-	if (game_super_task(p)) {
-		if (sysctl_boost_stask_to_big)
-			return rd->max_cap_orig_cpu;
-		return rd->mid_cap_orig_cpu;
-	}
-
-	if (game_vip_task(p))
-		return rd->mid_cap_orig_cpu;
-
-	if (fas_power_bias(p))
-		return rd->min_cap_orig_cpu;
-#endif
 
 	if (start_cpu == -1 || start_cpu == rd->max_cap_orig_cpu)
 		return start_cpu;
@@ -7067,10 +7054,6 @@ static void find_best_target(struct sched_domain *sd, cpumask_t *cpus,
 	bool rtg_high_prio_task = task_rtg_high_prio(p);
 #ifdef CONFIG_XIAOMI_MIUI
 	struct root_domain *rd;
-#endif
-#ifdef CONFIG_PACKAGE_RUNTIME_INFO
-	if (!prefer_idle)
-		prefer_idle = !!game_vip_task(p);
 #endif
 
 	/*
@@ -7445,21 +7428,6 @@ static void find_best_target(struct sched_domain *sd, cpumask_t *cpus,
 		 * iterate lower capacity CPUs unless the task can't be
 		 * accommodated in the higher capacity CPUs.
 		 */
-#ifdef CONFIG_PACKAGE_RUNTIME_INFO
-		if (!sysctl_boost_stask_to_big) {
-			if (best_idle_cpu != -1) {
-				if (game_vip_task(p))
-					break;
-			} else if (target_cpu != -1 || best_active_cpu != -1) {
-				if (game_vip_task(p))
-					break;
-			}
-		} else {
-			if (game_vip_task(p) &&
-				(best_idle_cpu != -1 || target_cpu != -1 || best_active_cpu != -1))
-				break;
-		}
-#endif
 
 		if ((prefer_idle && best_idle_cpu != -1) ||
 		    (boosted && (best_idle_cpu != -1 || target_cpu != -1 ||
@@ -8003,9 +7971,6 @@ static int find_energy_efficient_cpu(struct task_struct *p, int prev_cpu,
 #endif
 	if (task_placement_boost_enabled(p) || fbt_env.need_idle || boosted ||
 	    is_rtg || __cpu_overutilized(prev_cpu, delta) ||
-#ifdef CONFIG_PACKAGE_RUNTIME_INFO
-	    game_vip_task(p) ||
-#endif
 	    !task_fits_max(p, prev_cpu) || cpu_isolated(prev_cpu)) {
 		best_energy_cpu = cpu;
 		goto unlock;
@@ -8065,13 +8030,6 @@ eas_not_ready:
 	return -1;
 }
 
-#ifdef CONFIG_PACKAGE_RUNTIME_INFO
-static inline void wake_render(struct task_struct *p)
-{
-	if (is_render_thread(p))
-		current->pkg.migt.wake_render++;
-}
-#endif
 
 /*
  * select_task_rq_fair: Select target runqueue for the waking task in domains
@@ -8097,9 +8055,6 @@ select_task_rq_fair(struct task_struct *p, int prev_cpu, int sd_flag, int wake_f
 
 	if (static_branch_unlikely(&sched_energy_present)) {
 		rcu_read_lock();
-#ifdef CONFIG_PACKAGE_RUNTIME_INFO
-		wake_render(p);
-#endif
 
 		new_cpu = find_energy_efficient_cpu(p, prev_cpu, sync,
 						    sibling_count_hint);
