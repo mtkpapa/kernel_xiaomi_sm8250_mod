@@ -191,16 +191,11 @@ build_miui() {
 	
 	scripts/config --file out/.config \
 		--set-str STATIC_USERMODEHELPER_PATH /system/bin/micd \
-		-e PERF_CRITICAL_RT_TASK	\
-		-e SF_BINDER		\
 		-e OVERLAY_FS		\
 		-d DEBUG_FS \
 		-e MIHW \
-		-e BINDER_OPT \
 		-e KPERFEVENTS \
-		-e PERF_HUMANTASK \
 		-d LOCALVERSION_AUTO \
-		-e SF_BINDER \
 		-e XIAOMI_MIUI \
 		-d MI_MEMORY_SYSFS \
 		-e TASK_DELAY_ACCT \
