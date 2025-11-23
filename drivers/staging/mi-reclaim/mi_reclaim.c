@@ -235,11 +235,7 @@ static void mi_reclaim_thread_affinity(struct task_struct *task)
 	cpu_bitmap[0] = 15;
 	newmask = to_cpumask(cpu_bitmap);
 
-#if(LINUX_VERSION_CODE >= KERNEL_VERSION(5,4,0))
 	if (!cpumask_equal(newmask, &task->cpus_mask)) {
-#else
-	if (!cpumask_equal(newmask, &task->cpus_allowed)) {
-#endif
 		cpumask_t cpumask_temp;
 		cpumask_and(&cpumask_temp, newmask, cpu_online_mask);
 
