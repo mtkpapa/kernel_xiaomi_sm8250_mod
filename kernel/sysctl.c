@@ -369,15 +369,6 @@ static struct ctl_table kern_table[] = {
 	},
 #endif
 #ifdef CONFIG_SCHED_DEBUG
-#ifdef CONFIG_XIAOMI_MIUI
-	{
-		.procname       = "sched_stask_to_big",
-		.data           = &sysctl_boost_stask_to_big,
-		.maxlen         = sizeof(unsigned int),
-		.mode           = 0644,
-		.proc_handler   = proc_dointvec,
-	},
-#endif
 #ifdef CONFIG_SMP
 	{
 		.procname	= "sched_tunable_scaling",

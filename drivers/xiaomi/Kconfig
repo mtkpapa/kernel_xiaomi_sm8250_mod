@@ -11,22 +11,6 @@ config XIAOMI_MIUI
 
 if XIAOMI_MIUI
 
-config PERF_HUMANTASK
-	bool "Enable MIUI humantask performance feature"
-	help
-	  This option adds support to switch on/off the sched humantask.
-
-config PERF_CRITICAL_RT_TASK
-	bool "Enable set rt binder thread" if EXPERT
-	help
-	  This option speeds ui feature by setting BlastBufferQueue binder
-	  thread to FIFO.
-
-config SF_BINDER
-	bool "Enable surfaceflinger binder thread" if EXPERT
-	help
-	  Xiaomi restore surfaceflinger binder priority FIFO
-
 config MIUI_ZRAM_MEMORY_TRACKING
 	bool "Track zRam stats"
 	depends on ZRAM

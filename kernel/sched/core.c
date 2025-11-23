@@ -5872,9 +5872,6 @@ long sched_setaffinity(pid_t pid, const struct cpumask *in_mask)
 
 	cpuset_cpus_allowed(p, cpus_allowed);
 	cpumask_and(new_mask, in_mask, cpus_allowed);
-#ifdef CONFIG_XIAOMI_MIUI
-	trace_sched_setaffinity(pid, in_mask);
-#endif
 
 	/*
 	 * Since bandwidth control happens on root_domain basis,
@@ -8596,42 +8593,3 @@ const u32 sched_prio_to_wmult[40] = {
 #undef CREATE_TRACE_POINTS
 
 __read_mostly bool sched_predl = 1;
-
-#ifdef CONFIG_XIAOMI_MIUI
-inline bool is_critical_task(struct task_struct *p)
-{
-	return is_top_app(p) || is_inherit_top_app(p);
-}
-
-inline bool is_top_app(struct task_struct *p)
-{
-	return p && p->top_app > 0;
-}
-
-inline bool is_inherit_top_app(struct task_struct *p)
-{
-	return p && p->inherit_top_app > 0;
-}
-
-inline void set_inherit_top_app(struct task_struct *p, struct task_struct *from)
-{
-	if (!p || !from)
-		return;
-	if (is_critical_task(p) || from->inherit_top_app >= INHERIT_DEPTH)
-		return;
-	p->inherit_top_app = from->inherit_top_app + 1;
-#ifdef CONFIG_PERF_HUMANTASK
-	p->human_task = 1;
-#endif
-}
-
-inline void restore_inherit_top_app(struct task_struct *p)
-{
-	if (p && is_inherit_top_app(p)) {
-		p->inherit_top_app = 0;
-#ifdef CONFIG_PERF_HUMANTASK
-		p->human_task = 0;
-#endif
-	}
-}
-#endif

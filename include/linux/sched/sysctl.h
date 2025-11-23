@@ -57,11 +57,6 @@ int sched_proc_update_handler(struct ctl_table *table, int write,
 extern int sched_boost_handler(struct ctl_table *table, int write,
 			void __user *buffer, size_t *lenp, loff_t *ppos);
 
-#ifdef CONFIG_XIAOMI_MIUI
-extern int sched_boost_top_app_handler(struct ctl_table *table, int write,
-			void __user *buffer, size_t *lenp, loff_t *ppos);
-#endif
-
 /*
  *  control realtime throttling:
  *

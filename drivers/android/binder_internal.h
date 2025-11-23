@@ -71,9 +71,6 @@ struct binderfs_info {
 	struct binderfs_mount_opts mount_opts;
 	int device_count;
 	struct dentry *proc_log_dir;
-#ifdef CONFIG_XIAOMI_MIUI
-	struct dentry *proc_transaction_log_dir;
-#endif
 };
 
 extern const struct file_operations binder_fops;
