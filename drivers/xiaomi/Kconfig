@@ -27,6 +27,11 @@ config PERF_CRITICAL_RT_TASK
 	  This option speeds ui feature by setting BlastBufferQueue binder
 	  thread to FIFO.
 
+config SF_BINDER
+	bool "Enable surfaceflinger binder thread" if EXPERT
+	help
+	  Xiaomi restore surfaceflinger binder priority FIFO
+
 source "drivers/xiaomi/fragmention/Kconfig"
 
 endif
