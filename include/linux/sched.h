@@ -1289,7 +1289,9 @@ struct task_struct {
 	 */
 	u64				timer_slack_ns;
 	u64				default_timer_slack_ns;
-
+#ifdef CONFIG_PERF_CRITICAL_RT_TASK
+	unsigned int    		critical_rt_task;
+#endif
 #ifdef CONFIG_KASAN
 	unsigned int			kasan_depth;
 #endif
